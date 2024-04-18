@@ -27,11 +27,8 @@ def detect_reflected_edges(image):
     # 找到图像的轮廓
     contours, _ = cv2.findContours(th1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    # 记录玻璃和反射图像的边缘坐标
-    edges = {
-        'glass': {'top': image.shape[1], 'left': image.shape[0], 'bottom': image.shape[1], 'right': image.shape[0]},
-        'reflected': {'top': [], 'left': [], 'bottom': [], 'right': []}
-    }
+    # 记录反射图像的边缘坐标
+    edges = {'top': [], 'left': [], 'bottom': [], 'right': []}
 
     # 遍历轮廓
     for contour in contours:
@@ -58,19 +55,19 @@ def detect_reflected_edges(image):
         if top_points:
             min_x, max_x = min(top_points), max(top_points)
             if max_x - min_x >= 4:
-                edges['reflected']['top'].append((min_x, max_x))
+                edges['top'].append((min_x, max_x))
         if left_points:
             min_y, max_y = min(left_points), max(left_points)
             if max_y - min_y >= 4:
-                edges['reflected']['left'].append((min_y, max_y))
+                edges['left'].append((min_y, max_y))
         if bottom_points:
             min_x, max_x = min(bottom_points), max(bottom_points)
             if max_x - min_x >= 4:
-                edges['reflected']['bottom'].append((min_x, max_x))
+                edges['bottom'].append((min_x, max_x))
         if right_points:
             min_y, max_y = min(right_points), max(right_points)
             if max_y - min_y >= 4:
-                edges['reflected']['right'].append((min_y, max_y))
+                edges['right'].append((min_y, max_y))
 
     # 绘制轮廓
     cv2.drawContours(image, contours, -1, (0, 255, 0), 2)
@@ -87,12 +84,12 @@ if __name__ == "__main__":
     edges, image_with_contours = detect_reflected_edges(image)
 
     # 打印边缘信息
-    print("|      | 完整图像边缘 | 反射图像边缘  |")
-    print("| ---- | ------------ | ------------- |")
-    print(f"| 上   | {edges['glass']['top']}       | {edges['reflected']['top']}       |")
-    print(f"| 左   | {edges['glass']['left']}       | {edges['reflected']['left']}       |")
-    print(f"| 下   | {edges['glass']['bottom']}       | {edges['reflected']['bottom']}       |")
-    print(f"| 右   | {edges['glass']['right']}       | {edges['reflected']['right']}       |")
+    print("|      | 反射图像边缘  |")
+    print("| ---- | ------------- |")
+    print(f"| 上   | {edges['top']}       |")
+    print(f"| 左   | {edges['left']}       |")
+    print(f"| 下   | {edges['bottom']}       |")
+    print(f"| 右   | {edges['right']}       |")
 
     # 显示包含轮廓的图像
     plt.figure(figsize=(10, 5))

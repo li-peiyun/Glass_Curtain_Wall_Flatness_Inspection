@@ -15,6 +15,7 @@ def crop_green_edges(image):
 
     返回值:
     - cropped_image: 裁剪掉绿色窗框的图像。
+    - relative_position: 相对位置信息 (relative_x, relative_y)。
     """
 
     # 将图像转换为HSV色彩空间
@@ -55,10 +56,18 @@ def crop_green_edges(image):
 
     # 偏移
     offset = 14
+
     # 裁剪图像
     cropped_image = image[top_edge + offset:bottom_edge - offset, left_edge + offset:right_edge - offset]
 
-    return cropped_image
+    # 相对位置信息
+    relative_x = left_edge + offset
+    relative_y = top_edge + offset
+    w = right_edge - left_edge - 2 * offset
+    h = bottom_edge - top_edge - 2 * offset
+    relative_position = (relative_x, relative_y)
+
+    return cropped_image, relative_position
 
 
 # 测试
@@ -66,9 +75,14 @@ if __name__ == "__main__":
     image_path = 'split/s2.png'
     image = cv2.imread(image_path)
 
-    cropped_image = crop_green_edges(image)
+    cropped_image, relative_position = crop_green_edges(image)
 
+    # 显示裁剪后的图像
     cv2.namedWindow('cropped image', cv2.WINDOW_NORMAL)
     cv2.imshow("cropped image", cropped_image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+    # 打印相对位置信息
+    print("相对位置信息：")
+    print(relative_position)

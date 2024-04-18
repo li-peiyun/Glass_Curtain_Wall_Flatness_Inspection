@@ -14,6 +14,7 @@ def split_glass_wall(image):
 
     返回值:
     - cropped_images: 裁剪后的窗户图像列表。
+    - cropped_positions: 裁剪后的窗户位置信息 (x, y) 列表。
     - adjacency_dict: 图片的邻接关系字典。
     """
 
@@ -37,12 +38,16 @@ def split_glass_wall(image):
 
     # 使用删除后的最大面积作为新的面积标准
     max_area = cv2.contourArea(max(contours, key=cv2.contourArea))
-    min_area = 0.5 * max_area  # 90% of the max contour area
+    min_area = 0.9 * max_area  # 90% of the max contour area
 
     filtered_contours = filter_contours_by_area(contours, min_area)
 
+    # 存储裁剪窗户的位置信息(x, y)
+    cropped_positions = []
+
     def crop_image_by_contour(image, contour):
         x, y, w, h = cv2.boundingRect(contour)
+        cropped_positions.append((x, y))
         return image[y:y + h, x:x + w]
 
     cropped_images = [crop_image_by_contour(image, c) for c in filtered_contours]
@@ -87,19 +92,23 @@ def split_glass_wall(image):
                 adjacency_dict[i][direction].append(j)
                 adjacency_dict[j][invert_direction(direction)].append(i)
 
-    return cropped_images, adjacency_dict
+    return cropped_images, cropped_positions, adjacency_dict
 
 
 if __name__ == "__main__":
     file_path = "data/split.png"
     image = cv2.imread(file_path)
-    cropped_images, adjacency_dict = split_glass_wall(image)
+    cropped_images, cropped_positions, adjacency_dict = split_glass_wall(image)
 
     # 显示得到的图片
     for idx, img in enumerate(cropped_images):
         cv2.namedWindow('splited image', cv2.WINDOW_NORMAL)
         cv2.imshow("splited image", img)
         cv2.waitKey(0)
+
+    # 打印位置信息列表
+    print("位置信息列表：")
+    print(cropped_positions)
 
     # 打印邻接字典
     print("邻接字典判断相邻性：")
