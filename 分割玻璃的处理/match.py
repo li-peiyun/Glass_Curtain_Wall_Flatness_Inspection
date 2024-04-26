@@ -100,8 +100,10 @@ def match_reflected_edges(image):
         adjacents = adjacency_dict[idx]
 
         # 检查上侧是否有邻接
+        print("垂直检测")
         diretionDetect(adjacents, all_edges, positions, idx, 'up', 'top', 'bottom')
-
+        print("水平检测")
+        diretionDetect(adjacents, all_edges, positions, idx, 'right', 'right', 'left')
 
 if __name__ == "__main__":
     file_path = "data/split.png"
